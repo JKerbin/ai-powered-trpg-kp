@@ -1,18 +1,12 @@
 "use client"
 import { useState, useRef, useEffect } from "react";
 import styles from "./page.module.css";
+import { generateChatResponse } from './action';
 
 interface Message {
   id: string;
   content: string;
   sender: 'user' | 'bot';
-}
-
-// 定义API响应类型
-interface ApiResponse {
-  success: boolean;
-  response?: string;
-  error?: string;
 }
 
 export default function Chatbot() {
@@ -24,6 +18,7 @@ export default function Chatbot() {
     }
   ]);
   const [input, setInput] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // 自动滚动到最新消息
@@ -35,9 +30,9 @@ export default function Chatbot() {
     scrollToBottom();
   }, [messages]);
 
-  // 处理发送消息 - 现在调用API而不是在客户端生成回答
+  // 处理发送消息 - 使用React Action调用服务器端函数
   const handleSend = async () => {
-    if (input.trim() === '') return;
+    if (input.trim() === '' || isLoading) return;
 
     // 添加用户消息
     const userMessage: Message = {
@@ -48,24 +43,17 @@ export default function Chatbot() {
 
     setMessages(prev => [...prev, userMessage]);
     setInput('');
+    setIsLoading(true);
 
     try {
-      // 调用服务器端API获取回答
-      const response = await fetch('/api/chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ message: input })
-      });
+      // 调用React Action获取回答（在服务器端执行）
+      const result = await generateChatResponse(input);
 
-      const data: ApiResponse = await response.json();
-
-      if (data.success && data.response) {
+      if (result.success && result.response) {
         // 添加机器人回复
         const botMessage: Message = {
           id: (Date.now() + 1).toString(),
-          content: data.response,
+          content: result.response,
           sender: 'bot'
         };
         setMessages(prev => [...prev, botMessage]);
@@ -73,7 +61,7 @@ export default function Chatbot() {
         // 添加错误消息
         const errorMessage: Message = {
           id: (Date.now() + 1).toString(),
-          content: '抱歉，我暂时无法回复你的消息。请稍后再试。',
+          content: result.error || '抱歉，我暂时无法回复你的消息。请稍后再试。',
           sender: 'bot'
         };
         setMessages(prev => [...prev, errorMessage]);
@@ -86,12 +74,14 @@ export default function Chatbot() {
         sender: 'bot'
       };
       setMessages(prev => [...prev, errorMessage]);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   // 处理回车键发送
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (e.key === 'Enter' && !e.shiftKey && !isLoading) {
       e.preventDefault();
       handleSend();
     }
@@ -113,6 +103,17 @@ export default function Chatbot() {
             </div>
           </div>
         ))}
+        {isLoading && (
+          <div className={`${styles.message} ${styles.botMessage} ${styles.loadingMessage}`}>
+            <div className={styles.messageContent}>
+              <div className={styles.loadingDots}>
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+            </div>
+          </div>
+        )}
         <div ref={messagesEndRef} />
       </div>
       <div className={styles.chatbotFooter}>
@@ -122,6 +123,7 @@ export default function Chatbot() {
           onChange={(e) => setInput(e.target.value)}
           onKeyPress={handleKeyPress}
           placeholder="输入消息..."
+          disabled={isLoading}
           className={styles.input}
         />
         <button onClick={handleSend} className={styles.sendButton}>

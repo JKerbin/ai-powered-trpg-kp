@@ -1,5 +1,4 @@
-// 服务器端API路由，用于生成乱数假文
-import { NextResponse } from 'next/server';
+'use server';
 
 // 生成乱数假文的函数
 const generateRandomText = (): string => {
@@ -35,24 +34,29 @@ const generateRandomText = (): string => {
   return result.trim();
 };
 
-// 处理POST请求
-export async function POST(request: Request) {
+// 定义响应类型
+export interface ActionResponse {
+  success: boolean;
+  response?: string;
+  error?: string;
+}
+
+// React Action函数 - 在服务器端执行
+export async function generateChatResponse(message: string): Promise<ActionResponse> {
   try {
-    // 从请求体中获取用户消息（虽然在这个简单实现中我们不使用它）
-    const { message } = await request.json();
-    
-    // 生成乱数假文
+    // 这里可以添加实际的大模型调用逻辑
+    // 目前仍然使用乱数假文，但在未来可以替换为真实的AI模型调用
     const botResponse = generateRandomText();
     
-    // 返回响应
-    return NextResponse.json({
+    return {
       success: true,
       response: botResponse
-    });
+    };
   } catch (error) {
-    return NextResponse.json(
-      { success: false, error: 'Failed to generate response' },
-      { status: 500 }
-    );
+    console.error('Error generating chat response:', error);
+    return {
+      success: false,
+      error: 'Failed to generate response'
+    };
   }
 }
