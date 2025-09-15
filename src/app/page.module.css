@@ -67,10 +67,7 @@
   height: 48px;
   padding: 0 20px;
   border: 1px solid transparent;
-  transition:
-    background 0.2s,
-    color 0.2s,
-    border-color 0.2s;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -220,6 +217,15 @@ a.secondary {
   opacity: 0.7;
 }
 
+.streamingMessage {
+  opacity: 0.9;
+}
+
+.streamingIndicator {
+  display: inline-block;
+  margin-left: 4px;
+}
+
 .loadingDots {
   display: flex;
   gap: 4px;
@@ -243,7 +249,9 @@ a.secondary {
 }
 
 @keyframes loading {
-  0%, 80%, 100% {
+  0%,
+  80%,
+  100% {
     transform: scale(0);
   }
   40% {
@@ -320,20 +328,20 @@ a.secondary {
     border-radius: 0;
     box-shadow: none;
   }
-  
+
   .message {
     max-width: 85%;
   }
-  
+
   .chatbotHeader {
     font-size: 20px;
     padding: 16px;
   }
-  
+
   .chatbotBody {
     padding: 16px;
   }
-  
+
   .chatbotFooter {
     padding: 16px;
   }

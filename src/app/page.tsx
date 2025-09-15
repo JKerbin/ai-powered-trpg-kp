@@ -1,79 +1,180 @@
-"use client"
+"use client";
 import { useState, useRef, useEffect } from "react";
 import styles from "./page.module.css";
-import { generateChatResponse } from './action';
 
 interface Message {
   id: string;
   content: string;
-  sender: 'user' | 'bot';
+  sender: "user" | "bot";
+  isStreaming?: boolean;
+}
+
+// 定义流式响应数据类型
+interface StreamData {
+  success: boolean;
+  response?: string;
+  finished?: boolean;
+  error?: string;
 }
 
 export default function Chatbot() {
   const [messages, setMessages] = useState<Message[]>([
     {
-      id: '1',
-      content: '你好！我是一个简单的聊天机器人。无论你说什么，我都会回复乱数假文。',
-      sender: 'bot'
-    }
+      id: "1",
+      content:
+        "你好！我是一个简单的聊天机器人。无论你说什么，我都会回复乱数假文。",
+      sender: "bot",
+    },
   ]);
-  const [input, setInput] = useState('');
+  const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // 自动滚动到最新消息
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
 
-  // 处理发送消息 - 使用React Action调用服务器端函数
+  // 处理发送消息 - 使用流式API调用
   const handleSend = async () => {
-    if (input.trim() === '' || isLoading) return;
+    if (input.trim() === "" || isLoading) return;
 
     // 添加用户消息
     const userMessage: Message = {
       id: Date.now().toString(),
       content: input,
-      sender: 'user'
+      sender: "user",
     };
 
-    setMessages(prev => [...prev, userMessage]);
-    setInput('');
+    setMessages((prev) => [...prev, userMessage]);
+    setInput("");
     setIsLoading(true);
 
-    try {
-      // 调用React Action获取回答（在服务器端执行）
-      const result = await generateChatResponse(input);
+    // 生成机器人回复的初始消息ID
+    const botMessageId = (Date.now() + 1).toString();
 
-      if (result.success && result.response) {
-        // 添加机器人回复
-        const botMessage: Message = {
-          id: (Date.now() + 1).toString(),
-          content: result.response,
-          sender: 'bot'
-        };
-        setMessages(prev => [...prev, botMessage]);
-      } else {
-        // 添加错误消息
-        const errorMessage: Message = {
-          id: (Date.now() + 1).toString(),
-          content: result.error || '抱歉，我暂时无法回复你的消息。请稍后再试。',
-          sender: 'bot'
-        };
-        setMessages(prev => [...prev, errorMessage]);
+    // 创建一个初始的流式机器人消息
+    const initialBotMessage: Message = {
+      id: botMessageId,
+      content: "",
+      sender: "bot",
+      isStreaming: true,
+    };
+
+    setMessages((prev) => [...prev, initialBotMessage]);
+
+    try {
+      // 调用流式API获取回答
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ message: input }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+
+      const reader = response.body?.getReader();
+      if (!reader) {
+        throw new Error("No readable stream");
+      }
+
+      const decoder = new TextDecoder();
+      let partialLine = "";
+
+      // 处理流式响应
+      while (true) {
+        const { done, value } = await reader.read();
+
+        if (done) {
+          break;
+        }
+
+        // 解码接收到的数据
+        const chunk = decoder.decode(value, { stream: true });
+        // 合并之前可能不完整的行
+        const lines = (partialLine + chunk).split("\n");
+        // 保存最后一行（可能不完整）
+        partialLine = lines.pop() || "";
+
+        // 处理每一行数据
+        for (const line of lines) {
+          // 跳过空行
+          if (line.trim() === "") continue;
+
+          // 检查是否是数据行
+          if (line.startsWith("data:")) {
+            const dataStr = line.substring(5).trim();
+
+            // 检查是否结束标记
+            if (dataStr === "[DONE]") {
+              // 更新消息状态为非流式
+              setMessages((prev) =>
+                prev.map((msg) =>
+                  msg.id === botMessageId ? { ...msg, isStreaming: false } : msg
+                )
+              );
+              continue;
+            }
+
+            try {
+              // 解析JSON数据
+              const data: StreamData = JSON.parse(dataStr);
+
+              if (data.success && data.response) {
+                // 更新机器人消息内容
+                setMessages((prev) =>
+                  prev.map((msg) =>
+                    msg.id === botMessageId
+                      ? {
+                          ...msg,
+                          content: data.response || "", // 确保 content 不为 undefined
+                          isStreaming: !data.finished,
+                        }
+                      : msg
+                  )
+                );
+              } else if (data.error) {
+                // 更新为错误消息
+                setMessages((prev) =>
+                  prev.map((msg) =>
+                    msg.id === botMessageId
+                      ? {
+                          ...msg,
+                          content: data.error || "未知错误",
+                          isStreaming: false,
+                        }
+                      : msg
+                  )
+                );
+              }
+            } catch (jsonError) {
+              console.error("Error parsing stream data:", jsonError);
+            }
+          }
+        }
       }
     } catch (error) {
-      // 添加错误消息
-      const errorMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        content: '网络错误，请检查你的连接后重试。',
-        sender: 'bot'
-      };
-      setMessages(prev => [...prev, errorMessage]);
+      console.error("Error in streaming request:", error);
+      // 更新为错误消息
+      setMessages((prev) =>
+        prev.map((msg) =>
+          msg.id === botMessageId
+            ? {
+                ...msg,
+                content: "网络错误，请检查你的连接后重试。",
+                isStreaming: false,
+              }
+            : msg
+        )
+      );
     } finally {
       setIsLoading(false);
     }
@@ -81,7 +182,7 @@ export default function Chatbot() {
 
   // 处理回车键发送
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey && !isLoading) {
+    if (e.key === "Enter" && !e.shiftKey && !isLoading) {
       e.preventDefault();
       handleSend();
     }
@@ -93,27 +194,27 @@ export default function Chatbot() {
         <h1>简单聊天机器人</h1>
       </div>
       <div className={styles.chatbotBody}>
-        {messages.map(message => (
-          <div 
-            key={message.id} 
-            className={`${styles.message} ${message.sender === 'user' ? styles.userMessage : styles.botMessage}`}
+        {messages.map((message) => (
+          <div
+            key={message.id}
+            className={`${styles.message} ${
+              message.sender === "user" ? styles.userMessage : styles.botMessage
+            } ${message.isStreaming ? styles.streamingMessage : ""}`}
           >
             <div className={styles.messageContent}>
               {message.content}
+              {message.isStreaming && (
+                <span className={styles.streamingIndicator}>
+                  <span className={styles.loadingDots}>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                  </span>
+                </span>
+              )}
             </div>
           </div>
         ))}
-        {isLoading && (
-          <div className={`${styles.message} ${styles.botMessage} ${styles.loadingMessage}`}>
-            <div className={styles.messageContent}>
-              <div className={styles.loadingDots}>
-                <span></span>
-                <span></span>
-                <span></span>
-              </div>
-            </div>
-          </div>
-        )}
         <div ref={messagesEndRef} />
       </div>
       <div className={styles.chatbotFooter}>
