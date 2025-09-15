@@ -165,3 +165,141 @@ a.secondary {
     filter: invert();
   }
 }
+
+/* 聊天机器人样式 */
+.chatbotContainer {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  max-width: 800px;
+  margin: 0 auto;
+  background-color: var(--background);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.chatbotHeader {
+  background-color: var(--foreground);
+  color: var(--background);
+  padding: 20px;
+  text-align: center;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.chatbotBody {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.message {
+  max-width: 70%;
+  padding: 12px 16px;
+  border-radius: 18px;
+  word-wrap: break-word;
+}
+
+.userMessage {
+  align-self: flex-end;
+  background-color: var(--foreground);
+  color: var(--background);
+}
+
+.botMessage {
+  align-self: flex-start;
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+@media (prefers-color-scheme: dark) {
+  .botMessage {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--foreground);
+  }
+}
+
+.messageContent {
+  font-size: 16px;
+  line-height: 1.4;
+}
+
+.chatbotFooter {
+  display: flex;
+  padding: 20px;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  gap: 10px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .chatbotFooter {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+}
+
+.input {
+  flex: 1;
+  padding: 12px 16px;
+  border: 1px solid #ddd;
+  border-radius: 24px;
+  font-size: 16px;
+  outline: none;
+  background-color: var(--background);
+  color: var(--foreground);
+}
+
+@media (prefers-color-scheme: dark) {
+  .input {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+}
+
+.sendButton {
+  padding: 12px 24px;
+  background-color: var(--foreground);
+  color: var(--background);
+  border: none;
+  border-radius: 24px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.sendButton:hover {
+  background-color: var(--button-primary-hover);
+}
+
+.sendButton:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+@media (max-width: 600px) {
+  .chatbotContainer {
+    height: 100vh;
+    border-radius: 0;
+    box-shadow: none;
+  }
+  
+  .message {
+    max-width: 85%;
+  }
+  
+  .chatbotHeader {
+    font-size: 20px;
+    padding: 16px;
+  }
+  
+  .chatbotBody {
+    padding: 16px;
+  }
+  
+  .chatbotFooter {
+    padding: 16px;
+  }
+}
