@@ -19,9 +19,20 @@ body {
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: sans-serif, system-ui, Avenir, Helvetica, Arial;
+  line-height: 1.5;
+  font-weight: lighter;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+div {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
 * {
@@ -38,5 +49,46 @@ a {
 @media (prefers-color-scheme: dark) {
   html {
     color-scheme: dark;
+  }
+}
+
+.grid-wrapper {
+  min-height: 100%;
+  width: 100%;
+  position: fixed;
+  background-color: #f8fafc;
+  z-index: -1000;
+
+  .grid-background {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background-image: linear-gradient(
+        to right,
+        rgba(0, 0, 0, 0.4) 0.1vh,
+        transparent 0.1vh
+      ),
+      linear-gradient(to bottom, rgba(0, 0, 0, 0.4) 0.1vh, transparent 0.1vh);
+    background-size: 3vw 10vh;
+    -webkit-mask-image: radial-gradient(
+      ellipse 70% 60% at 50% 75%,
+      #000 60%,
+      transparent 100%
+    );
+    mask-image: radial-gradient(
+      ellipse 70% 60% at 50% 75%,
+      #000 60%,
+      transparent 100%
+    );
+  }
+}
+
+@media (max-width: 1000px) {
+  .grid-wrapper {
+    .grid-background {
+      background-size: 8vw 10vh;
+    }
   }
 }

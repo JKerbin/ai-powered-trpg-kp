@@ -120,6 +120,10 @@ a.secondary {
     text-decoration: underline;
     text-underline-offset: 4px;
   }
+
+  .navigateButton:hover {
+    background: var(--button-primary-hover);
+  }
 }
 
 @media (max-width: 600px) {
@@ -155,11 +159,23 @@ a.secondary {
     align-items: center;
     justify-content: center;
   }
+
+  .homeContainer {
+    padding: 20px;
+  }
+
+  .homeContent h1 {
+    font-size: 24px;
+  }
+
+  .navigateButton {
+    width: 100%;
+  }
 }
 
 @media (prefers-color-scheme: dark) {
   .logo {
-    filter: invert();
+    filter: invert(100%);
   }
 }
 
@@ -345,4 +361,78 @@ a.secondary {
   .chatbotFooter {
     padding: 16px;
   }
+}
+
+/* 首页样式 */
+.homeContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 40px;
+  background-color: var(--background);
+}
+
+.homeContent {
+  text-align: center;
+  max-width: 600px;
+  background-color: var(--background);
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.homeContent h1 {
+  font-size: 36px;
+  margin-bottom: 20px;
+  color: var(--foreground);
+}
+
+.homeContent p {
+  font-size: 18px;
+  color: var(--foreground);
+  opacity: 0.8;
+  margin-bottom: 30px;
+}
+
+.navigateButton {
+  background-color: var(--foreground);
+  color: var(--background);
+  border: none;
+  border-radius: 24px;
+  padding: 16px 32px;
+  font-size: 18px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.pageInfo {
+  margin-top: 40px;
+  text-align: left;
+}
+
+.pageInfo p {
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+
+.pageInfo ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.pageInfo li {
+  padding: 8px 0;
+  padding-left: 20px;
+  position: relative;
+}
+
+.pageInfo li:before {
+  content: "▶";
+  position: absolute;
+  left: 0;
+  color: var(--foreground);
+  opacity: 0.7;
 }
