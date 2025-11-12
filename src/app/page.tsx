@@ -6,6 +6,7 @@ import { useRef } from "react";
 import "./page.scss";
 
 export default function HomePage() {
+  const faceContainerRef = useRef<HTMLDivElement>(null);
   const logoContainerRef = useRef<HTMLDivElement>(null);
   const firstShapeRef = useRef<HTMLDivElement>(null);
   const secondShapeRef = useRef<HTMLDivElement>(null);
@@ -18,21 +19,35 @@ export default function HomePage() {
     // 创建时间轴
     const tl = gsap.timeline();
     tl.set(invitationRef.current, { opacity: 0 })
-      .to(firstShapeRef.current, {
-        width: "17vw",
-        height: "17vw",
-        duration: 1.4,
-        ease: "power2.inOut",
-      })
+      .to(
+        faceContainerRef.current,
+        {
+          width: "14vw",
+          height: "14vw",
+          duration: 1,
+          ease: "power2.inOut",
+        },
+        0
+      )
+      .to(
+        firstShapeRef.current,
+        {
+          width: "17vw",
+          height: "17vw",
+          duration: 1,
+          ease: "power2.inOut",
+        },
+        0.4
+      )
       .to(
         secondShapeRef.current,
         {
           width: "20vw",
           height: "20vw",
-          duration: 1.4,
+          duration: 1,
           ease: "power2.inOut",
         },
-        0
+        0.4
       )
       .to(logoContainerRef.current, {
         rotation: 45,
@@ -59,16 +74,13 @@ export default function HomePage() {
         },
         2.6
       )
-      .to(
-        logoContainerRef.current,
-        {
-          y: "-30%",
-          duration: 1.2,
-          ease: "power2.inOut",
-          repeat: -1,
-          yoyo: true,
-        }
-      );
+      .to(logoContainerRef.current, {
+        y: "-30%",
+        duration: 1.2,
+        ease: "power2.inOut",
+        repeat: -1,
+        yoyo: true,
+      });
   }, []);
 
   const handleNavigateToChat = () => {
@@ -92,7 +104,7 @@ export default function HomePage() {
               <div className="bottom-part"></div>
             </div>
           </div>
-          <div className="robot-face">
+          <div ref={faceContainerRef} className="robot-face">
             <div ref={eyesRef} className="eyes"></div>
           </div>
         </div>
