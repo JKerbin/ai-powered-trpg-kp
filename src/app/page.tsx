@@ -2,7 +2,7 @@
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { useRouter } from "next/navigation";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import "./page.scss";
 
 export default function HomePage() {
@@ -12,8 +12,10 @@ export default function HomePage() {
   const secondShapeRef = useRef<HTMLDivElement>(null);
   const eyesRef = useRef<HTMLDivElement>(null);
   const invitationRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const router = useRouter();
+  const [invitationCode, setInvitationCode] = useState('');
 
   useGSAP(() => {
     // 创建时间轴
@@ -83,15 +85,29 @@ export default function HomePage() {
       });
   }, []);
 
+  // 有效的测试邀请码列表
+  const validTesterIds = [
+    "20c904c2-f129-42e2-a832-1a7d7933f65d",
+    "c59f304c-1cac-40e7-9fa2-7a7640c9410f",
+    "e295ee73-7d1a-426d-8360-766f7a52469e"
+  ];
+
   const handleNavigateToChat = () => {
-    router.push("/saveList");
+    // 验证邀请码是否在有效列表中
+    if (validTesterIds.includes(invitationCode)) {
+      // 验证通过，跳转到存档列表页面，并携带用户ID
+      router.push(`/saveList?userId=${invitationCode}`);
+    } else {
+      // 验证失败，清空输入框
+      setInvitationCode('');
+      if (inputRef.current) {
+        inputRef.current.focus();
+      }
+    }
   };
 
   return (
     <>
-      <div className="grid-wrapper">
-        <div className="grid-background"></div>
-      </div>
       <div className="home-container">
         <div ref={logoContainerRef} className="logo-container">
           <div ref={firstShapeRef} className="deco-shape">
@@ -115,9 +131,17 @@ export default function HomePage() {
           <div className="corner corner-bottom-right"></div>
 
           <input
+            ref={inputRef}
             className="invitation-input"
             type="text"
             placeholder="输入测试邀请码"
+            value={invitationCode}
+            onChange={(e) => setInvitationCode(e.target.value)}
+            onKeyPress={(e) => {
+              if (e.key === 'Enter') {
+                handleNavigateToChat();
+              }
+            }}
           />
           <button className="invitation-button" onClick={handleNavigateToChat}>
             <img src="/enter.svg" alt="enter" />

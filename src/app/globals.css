@@ -1,5 +1,5 @@
 :root {
-  --background: #ffffff;
+  --background: #f8fafc;
   --foreground: #171717;
 }
 
@@ -56,7 +56,7 @@ a {
   min-height: 100%;
   width: 100%;
   position: fixed;
-  background-color: #f8fafc;
+  background-color: var(--background);
   z-index: -1000;
 
   .grid-background {
