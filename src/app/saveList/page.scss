@@ -123,20 +123,43 @@
       flex-direction: column;
 
       .save-item {
-        padding: 1vw;
-        transition: all 0.3s ease;
+        padding: 1vw 1.4vw;
         cursor: pointer;
+        transition: all 0.3s ease;
 
         .save-item-content {
+          transition: all 0.3s ease;
           background-color: rgba(0, 0, 0, 0.4);
           padding: 1vw;
           display: flex;
-          flex-direction: column;
+          position: relative;
+
+          .save-item-info {
+            width: 200%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+          }
+
+          .delete-save-btn {
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+
+            img {
+              width: 4vh;
+              height: 4vh;
+            }
+          }
         }
 
         &:hover {
           background: rgba(0, 0, 0, 0.4);
-          transform: translateX(1vw);
+
+          .save-item-content {
+            transform: scale(1.02);
+          }
         }
       }
     }
