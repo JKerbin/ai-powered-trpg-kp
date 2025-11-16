@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
+import "./page.scss";
 
 // 定义存档元数据接口
 export interface SaveMeta {

@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
-import styles from "./create.module.scss";
+import "./page.scss";
 
 export default function CreatePage() {
   const searchParams = useSearchParams();
@@ -17,14 +17,30 @@ export default function CreatePage() {
   const [success, setSuccess] = useState(false);
 
   useGSAP(() => {
-    gsap.fromTo(".create-container", {
-      opacity: 0,
-      y: 20,
-    }, {
-      opacity: 1,
-      y: 0,
-      duration: 0.8,
+    const tl = gsap.timeline({
+      defaults: {
+        duration: 0.5,
+      },
     });
+    tl.fromTo(
+      ".create-content",
+      {
+        opacity: 0,
+        height: "10vh",
+      },
+      {
+        opacity: 1,
+        height: "60vh",
+      }
+    ).fromTo(
+      ".create-form",
+      {
+        opacity: 0,
+      },
+      {
+        opacity: 1,
+      }
+    );
   }, []);
 
   // 处理文件选择
@@ -86,7 +102,7 @@ export default function CreatePage() {
       setSuccess(true);
       setSaveName("");
       setSelectedFile(null);
-      
+
       // 3秒后返回存档列表页面
       setTimeout(() => {
         router.push(`/saveList?userId=${userId}`);
@@ -109,7 +125,9 @@ export default function CreatePage() {
     return (
       <div className="create-container">
         <div className="error-message">未找到用户信息，请重新开始</div>
-        <button onClick={handleBack} className="back-button">返回</button>
+        <button onClick={handleBack} className="back-button">
+          返回
+        </button>
       </div>
     );
   }
@@ -148,7 +166,7 @@ export default function CreatePage() {
             </div>
 
             <div className="form-group">
-              <label htmlFor="pdfFile">上传PDF文件</label>
+              <label htmlFor="pdfFile">上传TRPG模组设定集</label>
               <div className="file-upload">
                 <input
                   type="file"
@@ -158,23 +176,21 @@ export default function CreatePage() {
                   disabled={isUploading}
                   className="file-input"
                 />
-                <label htmlFor="pdfFile" className="file-label">
+                <div className="file-label">
                   {selectedFile ? selectedFile.name : "点击选择PDF文件"}
-                </label>
+                </div>
               </div>
             </div>
 
             {error && <div className="error-message">{error}</div>}
 
-            <div className="form-actions">
-              <button 
-                type="submit" 
-                className="submit-button"
-                disabled={isUploading}
-              >
-                {isUploading ? "上传中..." : "创建存档"}
-              </button>
-            </div>
+            <button
+              type="submit"
+              className="submit-button"
+              disabled={isUploading}
+            >
+              {isUploading ? "上传中..." : "下一步"}
+            </button>
           </form>
         )}
       </div>
