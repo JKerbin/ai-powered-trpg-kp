@@ -16,6 +16,67 @@ export default function CreatePage() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
+  // 角色信息状态
+  const [characterInfo, setCharacterInfo] = useState({
+    NAME: "",
+    STR: 60,
+    CON: 45,
+    SIZ: 60,
+    INT: 65,
+    POW: 70,
+    DEX: 50,
+    APP: 75,
+    EDU: 65,
+    SAN: 30,
+    HP: 12,
+    WEAPON: "",
+    SKILLS: [] as string[],
+    DESCRIPTION: "",
+  });
+
+  // 可选技能列表
+  const availableSkills = [
+    "克苏鲁神话",
+    "议价",
+    "躲闪",
+    "快速交谈",
+    "聆听",
+    "侦查",
+    "心理学",
+    "医学",
+    "神秘学",
+    "说服",
+    "潜行",
+    "射击",
+    "格斗",
+    "恐吓",
+    "知识",
+    "语言",
+  ];
+
+  // 更新角色信息
+  const updateCharacterInfo = (field: string, value: any) => {
+    setCharacterInfo((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
+  // 处理技能选择
+  const handleSkillChange = (skill: string, isSelected: boolean) => {
+    if (isSelected) {
+      setCharacterInfo((prev) => ({
+        ...prev,
+        SKILLS: [...prev.SKILLS, skill],
+      }));
+    } else {
+      setCharacterInfo((prev) => ({
+        ...prev,
+        SKILLS: prev.SKILLS.filter((s) => s !== skill),
+      }));
+    }
+  };
+
   useGSAP(() => {
     const tl = gsap.timeline({
       defaults: {
@@ -30,7 +91,7 @@ export default function CreatePage() {
       },
       {
         opacity: 1,
-        height: "60vh",
+        height: "90vh",
       }
     ).fromTo(
       ".create-form",
@@ -77,6 +138,11 @@ export default function CreatePage() {
       return;
     }
 
+    if (!characterInfo.NAME.trim()) {
+      setError("请输入角色名称");
+      return;
+    }
+
     setIsUploading(true);
     setError(null);
 
@@ -86,6 +152,9 @@ export default function CreatePage() {
       formData.append("file", selectedFile);
       formData.append("userId", userId);
       formData.append("saveName", saveName);
+
+      // 添加角色信息到FormData
+      formData.append("characterInfo", JSON.stringify(characterInfo));
 
       // 发送请求到API
       const response = await fetch("/api/create", {
@@ -103,7 +172,7 @@ export default function CreatePage() {
       setSaveName("");
       setSelectedFile(null);
 
-      // 3秒后返回存档列表页面
+      // 3秒后进入下一步
       setTimeout(() => {
         router.push(`/saveList?userId=${userId}`);
       }, 3000);
@@ -135,11 +204,6 @@ export default function CreatePage() {
   return (
     <div className="create-container">
       <div className="create-content">
-        <div className="corner corner-top-left"></div>
-        <div className="corner corner-top-right"></div>
-        <div className="corner corner-bottom-left"></div>
-        <div className="corner corner-bottom-right"></div>
-
         <div className="title">
           <div className="title-text">创建新存档</div>
           <button onClick={handleBack} className="back-button">
@@ -153,31 +217,248 @@ export default function CreatePage() {
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="create-form">
-            <div className="form-group">
-              <label htmlFor="saveName">存档名称</label>
-              <input
-                type="text"
-                id="saveName"
-                value={saveName}
-                onChange={(e) => setSaveName(e.target.value)}
-                placeholder="请输入存档名称"
-                disabled={isUploading}
-              />
+            <div className="basic-section">
+              <h3>基本信息</h3>
+              <div className="form-group">
+                <label htmlFor="saveName">存档名称</label>
+                <input
+                  type="text"
+                  id="saveName"
+                  value={saveName}
+                  onChange={(e) => setSaveName(e.target.value)}
+                  placeholder="请输入存档名称"
+                  disabled={isUploading}
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="pdfFile">上传TRPG模组设定集</label>
+                <div className="file-upload">
+                  <input
+                    type="file"
+                    id="pdfFile"
+                    accept=".pdf"
+                    onChange={handleFileChange}
+                    disabled={isUploading}
+                    className="file-input"
+                  />
+                  <div className="file-label">
+                    {selectedFile ? selectedFile.name : "点击选择PDF文件"}
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <div className="form-group">
-              <label htmlFor="pdfFile">上传TRPG模组设定集</label>
-              <div className="file-upload">
+            <div className="character-section">
+              <h3>角色信息</h3>
+
+              {/* 文本类输入 */}
+              <div className="form-group">
+                <label htmlFor="characterName">角色名称 (NAME)</label>
                 <input
-                  type="file"
-                  id="pdfFile"
-                  accept=".pdf"
-                  onChange={handleFileChange}
+                  type="text"
+                  id="characterName"
+                  value={characterInfo.NAME}
+                  onChange={(e) => updateCharacterInfo("NAME", e.target.value)}
+                  placeholder="请输入角色名称"
                   disabled={isUploading}
-                  className="file-input"
                 />
-                <div className="file-label">
-                  {selectedFile ? selectedFile.name : "点击选择PDF文件"}
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="weapon">武器 (WEAPON)</label>
+                <input
+                  type="text"
+                  id="weapon"
+                  value={characterInfo.WEAPON}
+                  onChange={(e) =>
+                    updateCharacterInfo("WEAPON", e.target.value)
+                  }
+                  placeholder="请输入武器名称"
+                  disabled={isUploading}
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="description">角色描述 (DESCRIPTION)</label>
+                <textarea
+                  id="description"
+                  value={characterInfo.DESCRIPTION}
+                  onChange={(e) =>
+                    updateCharacterInfo("DESCRIPTION", e.target.value)
+                  }
+                  placeholder="请输入角色描述"
+                  rows={3}
+                  disabled={isUploading}
+                />
+              </div>
+
+              {/* 数值类滑条 */}
+              <div className="stats-container">
+                <div className="stat-item">
+                  <label>力量 (STR): {characterInfo.STR}</label>
+                  <input
+                    type="range"
+                    min="1"
+                    max="100"
+                    value={characterInfo.STR}
+                    onChange={(e) =>
+                      updateCharacterInfo("STR", parseInt(e.target.value))
+                    }
+                    disabled={isUploading}
+                  />
+                </div>
+
+                <div className="stat-item">
+                  <label>体质 (CON): {characterInfo.CON}</label>
+                  <input
+                    type="range"
+                    min="1"
+                    max="100"
+                    value={characterInfo.CON}
+                    onChange={(e) =>
+                      updateCharacterInfo("CON", parseInt(e.target.value))
+                    }
+                    disabled={isUploading}
+                  />
+                </div>
+
+                <div className="stat-item">
+                  <label>体型 (SIZ): {characterInfo.SIZ}</label>
+                  <input
+                    type="range"
+                    min="1"
+                    max="100"
+                    value={characterInfo.SIZ}
+                    onChange={(e) =>
+                      updateCharacterInfo("SIZ", parseInt(e.target.value))
+                    }
+                    disabled={isUploading}
+                  />
+                </div>
+
+                <div className="stat-item">
+                  <label>智力 (INT): {characterInfo.INT}</label>
+                  <input
+                    type="range"
+                    min="1"
+                    max="100"
+                    value={characterInfo.INT}
+                    onChange={(e) =>
+                      updateCharacterInfo("INT", parseInt(e.target.value))
+                    }
+                    disabled={isUploading}
+                  />
+                </div>
+
+                <div className="stat-item">
+                  <label>意志 (POW): {characterInfo.POW}</label>
+                  <input
+                    type="range"
+                    min="1"
+                    max="100"
+                    value={characterInfo.POW}
+                    onChange={(e) =>
+                      updateCharacterInfo("POW", parseInt(e.target.value))
+                    }
+                    disabled={isUploading}
+                  />
+                </div>
+
+                <div className="stat-item">
+                  <label>敏捷 (DEX): {characterInfo.DEX}</label>
+                  <input
+                    type="range"
+                    min="1"
+                    max="100"
+                    value={characterInfo.DEX}
+                    onChange={(e) =>
+                      updateCharacterInfo("DEX", parseInt(e.target.value))
+                    }
+                    disabled={isUploading}
+                  />
+                </div>
+
+                <div className="stat-item">
+                  <label>外貌 (APP): {characterInfo.APP}</label>
+                  <input
+                    type="range"
+                    min="1"
+                    max="100"
+                    value={characterInfo.APP}
+                    onChange={(e) =>
+                      updateCharacterInfo("APP", parseInt(e.target.value))
+                    }
+                    disabled={isUploading}
+                  />
+                </div>
+
+                <div className="stat-item">
+                  <label>教育 (EDU): {characterInfo.EDU}</label>
+                  <input
+                    type="range"
+                    min="1"
+                    max="100"
+                    value={characterInfo.EDU}
+                    onChange={(e) =>
+                      updateCharacterInfo("EDU", parseInt(e.target.value))
+                    }
+                    disabled={isUploading}
+                  />
+                </div>
+
+                <div className="stat-item">
+                  <label>理智 (SAN): {characterInfo.SAN}</label>
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    value={characterInfo.SAN}
+                    onChange={(e) =>
+                      updateCharacterInfo("SAN", parseInt(e.target.value))
+                    }
+                    disabled={isUploading}
+                  />
+                </div>
+
+                <div className="stat-item">
+                  <label>生命值 (HP): {characterInfo.HP}</label>
+                  <input
+                    type="range"
+                    min="1"
+                    max="50"
+                    value={characterInfo.HP}
+                    onChange={(e) =>
+                      updateCharacterInfo("HP", parseInt(e.target.value))
+                    }
+                    disabled={isUploading}
+                  />
+                </div>
+              </div>
+
+              {/* 技能多选 */}
+              <div className="form-group">
+                <label>技能选择 (SKILLS) - 可多选</label>
+                <div className="skills-container">
+                  {availableSkills.map((skill) => (
+                    <label key={skill} className="skill-checkbox">
+                      <input
+                        type="checkbox"
+                        checked={characterInfo.SKILLS.includes(skill)}
+                        onChange={(e) =>
+                          handleSkillChange(skill, e.target.checked)
+                        }
+                        disabled={isUploading}
+                      />
+                      {skill}
+                    </label>
+                  ))}
+                </div>
+                <div className="selected-skills">
+                  已选择:{" "}
+                  {characterInfo.SKILLS.length > 0
+                    ? characterInfo.SKILLS.join(", ")
+                    : "无"}
                 </div>
               </div>
             </div>

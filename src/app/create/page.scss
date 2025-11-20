@@ -10,46 +10,7 @@
     position: relative;
     width: 50%;
     padding: 5vh 2vw;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: space-between;
-    overflow: hidden;
-
-    .corner {
-      position: absolute;
-      width: 5vh;
-      height: 5vh;
-      border: 0.2vh solid rgba(0, 0, 0, 0.8);
-    }
-
-    .corner-top-left {
-      top: 0;
-      left: 0;
-      border-right: none;
-      border-bottom: none;
-    }
-
-    .corner-top-right {
-      top: 0;
-      right: 0;
-      border-left: none;
-      border-bottom: none;
-    }
-
-    .corner-bottom-left {
-      bottom: 0;
-      left: 0;
-      border-right: none;
-      border-top: none;
-    }
-
-    .corner-bottom-right {
-      bottom: 0;
-      right: 0;
-      border-left: none;
-      border-top: none;
-    }
+    overflow: auto;
 
     .title {
       display: flex;
@@ -87,6 +48,7 @@
     justify-content: center;
     align-items: center;
     gap: 3vh;
+    width: 100%;
 
     .form-group {
       display: flex;
@@ -95,8 +57,10 @@
       width: 100%;
 
       label {
+        margin-top: 1vh;
         font-size: 2vh;
         color: black;
+        font-weight: 500;
       }
 
       input[type="text"] {
@@ -106,6 +70,7 @@
         padding: 2vh 1vw;
         font-size: 2vh;
         transition: border-color 0.3s ease;
+        width: 100%;
 
         &::placeholder {
           color: rgba(255, 255, 255, 0.5);
@@ -116,6 +81,32 @@
           border: none;
         }
 
+        &:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+      }
+      
+      textarea {
+        background-color: rgba(0, 0, 0, 0.4);
+        color: #ffffff;
+        border: none;
+        padding: 2vh 1vw;
+        font-size: 2vh;
+        transition: border-color 0.3s ease;
+        width: 100%;
+        resize: vertical;
+        min-height: 10vh;
+        font-family: inherit;
+        
+        &::placeholder {
+          color: rgba(255, 255, 255, 0.5);
+        }
+        
+        &:focus {
+          outline: none;
+        }
+        
         &:disabled {
           opacity: 0.6;
           cursor: not-allowed;
@@ -176,6 +167,135 @@
       display: flex;
       justify-content: center;
       align-items: center;
+    }
+    
+    // 基本信息部分样式
+    .basic-section {
+      width: 100%;
+      padding: 2vh;
+      background-color: rgba(0, 0, 0, 0.1);
+      border-radius: 0.5vh;
+      
+      h3 {
+        color: black;
+        font-size: 2.5vh;
+        text-align: center;
+        border-bottom: 0.1vh solid rgba(0, 0, 0, 0.3);
+      }
+    }
+    
+    // 角色信息部分样式
+    .character-section {
+      width: 100%;
+      padding: 2vh;
+      background-color: rgba(0, 0, 0, 0.1);
+      border-radius: 0.5vh;
+      
+      h3 {
+        color: black;
+        font-size: 2.5vh;
+        text-align: center;
+        border-bottom: 0.1vh solid rgba(0, 0, 0, 0.3);
+      }
+    }
+    
+    // 统计数据滑条样式
+    .stats-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2vh;
+      margin: 2vh 0;
+      
+      @media (max-width: 768px) {
+        grid-template-columns: 1fr;
+      }
+      
+      .stat-item {
+        display: flex;
+        flex-direction: column;
+        gap: 1vh;
+        
+        label {
+          font-size: 1.8vh;
+          color: black;
+          font-weight: 500;
+        }
+        
+        input[type="range"] {
+          width: 100%;
+          height: 0.5vh;
+          background: rgba(0, 0, 0, 0.3);
+          border-radius: 0.25vh;
+          outline: none;
+          appearance: none;
+          cursor: pointer;
+          
+          &::-webkit-slider-thumb {
+            appearance: none;
+            width: 2vh;
+            height: 2vh;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 50%;
+            cursor: pointer;
+          }
+          
+          &::-moz-range-thumb {
+            width: 2vh;
+            height: 2vh;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+          }
+          
+          &:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+          }
+        }
+      }
+    }
+    
+    // 技能选择区域样式
+    .skills-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5vh;
+      margin-bottom: 1vh;
+    }
+    
+    .skill-checkbox {
+      display: flex;
+      align-items: center;
+      gap: 0.5vh;
+      padding: 1vh 1.5vh;
+      background-color: rgba(0, 0, 0, 0.2);
+      border-radius: 2vh;
+      cursor: pointer;
+      font-size: 1.6vh;
+      transition: all 0.3s ease;
+      
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.3);
+      }
+      
+      input[type="checkbox"] {
+        width: 1.5vh;
+        height: 1.5vh;
+        cursor: pointer;
+      }
+      
+      &:has(input[type="checkbox"]:checked) {
+        background-color: rgba(0, 0, 0, 0.5);
+        color: #ffffff;
+      }
+    }
+    
+    .selected-skills {
+      font-size: 2vh;
+      color: rgba(0, 0, 0, 1);
+      font-weight: 500;
+      font-style: italic;
     }
   }
 

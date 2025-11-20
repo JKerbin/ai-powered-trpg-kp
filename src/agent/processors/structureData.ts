@@ -1,7 +1,7 @@
 import { RAGApplicationBuilder, RAGApplication } from "@llm-tools/embedjs";
 import { OpenAi } from "@llm-tools/embedjs-openai";
 import { OpenAiEmbeddings } from "@llm-tools/embedjs-openai";
-import { HNSWDb } from "@llm-tools/embedjs-hnswlib";
+import { LibSqlDb } from "@llm-tools/embedjs-libsql";
 import { PdfLoader } from "@llm-tools/embedjs-loader-pdf";
 import dotenv from "dotenv";
 import path from "path";
@@ -71,7 +71,9 @@ class StructureDataProcessor {
           model: embeddingModel,
         })
       )
-      .setVectorDatabase(new HNSWDb())
+      .setVectorDatabase(
+        new LibSqlDb({ path: path.join(saveFilePath, "storyInfo.db") })
+      )
       .build();
 
     try {

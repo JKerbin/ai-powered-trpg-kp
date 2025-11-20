@@ -3,14 +3,14 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { promises as fs } from "fs";
 
-import CharacterInfoProcessor from "../processors/characterInfo";
+import CharacterInfoProcessor from "../processors/characterInfo.ts";
 import type {
   CharacterInfo,
   CharacterInfoPartial,
-} from "../processors/characterInfo";
-import PlotRecordProcessor from "../processors/plotRecord";
-import StoryInfoProcessor from "../processors/storyInfo";
-import StructureDataProcessor from "../processors/structureData";
+} from "../processors/characterInfo.ts";
+import PlotRecordProcessor from "../processors/plotRecord.ts";
+import StoryInfoProcessor from "../processors/storyInfo.ts";
+import StructureDataProcessor from "../processors/structureData.ts";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
