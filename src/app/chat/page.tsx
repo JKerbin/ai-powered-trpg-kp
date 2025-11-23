@@ -189,47 +189,69 @@ export default function Chatbot() {
   };
 
   return (
-    <div className={styles.chatbotContainer}>
-      <div className={styles.chatbotHeader}>
-        <h1>简单聊天机器人</h1>
-      </div>
-      <div className={styles.chatbotBody}>
-        {messages.map((message) => (
-          <div
-            key={message.id}
-            className={`${styles.message} ${
-              message.sender === "user" ? styles.userMessage : styles.botMessage
-            } ${message.isStreaming ? styles.streamingMessage : ""}`}
+    <div className={styles.chatContainer}>
+      <div className={styles.chatContent}>
+        <div className={styles.corner + ' ' + styles.cornerTopLeft}></div>
+        <div className={styles.corner + ' ' + styles.cornerTopRight}></div>
+        <div className={styles.corner + ' ' + styles.cornerBottomLeft}></div>
+        <div className={styles.corner + ' ' + styles.cornerBottomRight}></div>
+
+        <div className={styles.chatHeader}>
+          <div className={styles.titleText}>继续冒险</div>
+          <div 
+            className={styles.backButton}
+            onClick={() => {
+              const searchParams = new URLSearchParams(window.location.search);
+              const userId = searchParams.get('userId');
+              if (userId) {
+                window.location.href = `/saveList?userId=${userId}`;
+              }
+            }}
           >
-            <div className={styles.messageContent}>
-              {message.content}
-              {message.isStreaming && (
-                <span className={styles.streamingIndicator}>
-                  <span className={styles.loadingDots}>
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                  </span>
-                </span>
-              )}
-            </div>
+            <div className={styles.decoShape}></div>
+            <div className={styles.backButtonText}>返回存档列表</div>
           </div>
-        ))}
-        <div ref={messagesEndRef} />
-      </div>
-      <div className={styles.chatbotFooter}>
-        <input
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyPress={handleKeyPress}
-          placeholder="输入消息..."
-          disabled={isLoading}
-          className={styles.input}
-        />
-        <button onClick={handleSend} className={styles.sendButton}>
-          发送
-        </button>
+        </div>
+
+        <div className={styles.chatBody}>
+          {messages.map((message) => (
+            <div
+              key={message.id}
+              className={`${styles.message} ${
+                message.sender === "user" ? styles.userMessage : styles.botMessage
+              } ${message.isStreaming ? styles.streamingMessage : ""}`}
+            >
+              <div className={styles.messageContent}>
+                {message.content}
+                {message.isStreaming && (
+                  <span className={styles.streamingIndicator}>
+                    <span className={styles.loadingDots}>
+                      <span></span>
+                      <span></span>
+                      <span></span>
+                    </span>
+                  </span>
+                )}
+              </div>
+            </div>
+          ))}
+          <div ref={messagesEndRef} />
+        </div>
+
+        <div className={styles.chatFooter}>
+          <input
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyPress={handleKeyPress}
+            placeholder="输入消息..."
+            disabled={isLoading}
+            className={styles.input}
+          />
+          <button onClick={handleSend} className={styles.sendButton}>
+            <img src="/send.svg" alt="发送" />
+          </button>
+        </div>
       </div>
     </div>
   );
