@@ -224,7 +224,7 @@ class CharacterInfoProcessor {
     }
   }
 
-  verifyCharacterInfo(characterInfo: Array<any>): [Array<object>, Array<any>] {
+  verifyCharacterInfo(characterInfo: Array<any>): [Array<CharacterInfoPartial>, Array<any>] {
     const unformattedData: any[] = [];
     const formattingData = characterInfo.filter((character) => {
       try {
