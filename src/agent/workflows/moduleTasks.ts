@@ -91,6 +91,13 @@ class ModuleTasks {
 
   async initializeGame(playerInfo: CharacterInfo): Promise<string> {
     try {
+      const history = [];
+      await fs.mkdir(this.saveFilePath, { recursive: true });
+      await fs.writeFile(
+        this.historyPath,
+        JSON.stringify([], null, 2),
+        "utf-8"
+      );
       await this.agentLog("初始化故事模组");
       CharacterInfoProcessor.CharacterInfoSchema.parse(playerInfo);
       const [prologue] = await Promise.all([
@@ -115,6 +122,17 @@ class ModuleTasks {
         })(),
       ]);
       await this.agentLog("模组信息构建完成", false);
+      history.push({
+        timestamp: Date.now(),
+        role: "Game Keeper",
+        content: prologue,
+      });
+      await this.plotRecordProcessor.addPlotRecord(prologue);
+      await fs.writeFile(
+        this.historyPath,
+        JSON.stringify(history, null, 2),
+        "utf-8"
+      );
       return prologue;
     } catch (error) {
       throw new Error(
@@ -127,13 +145,7 @@ class ModuleTasks {
 
   async introduceGame(): Promise<string> {
     try {
-      const history = [];
-      await fs.mkdir(this.saveFilePath, { recursive: true });
-      await fs.writeFile(
-        this.historyPath,
-        JSON.stringify([], null, 2),
-        "utf-8"
-      );
+      const history = JSON.parse(await fs.readFile(this.historyPath, "utf-8"));
       const playerName = (
         await this.characterInfoProcessor.getPlayerNames()
       )[0];
@@ -207,7 +219,7 @@ class ModuleTasks {
         sceneInfo
       )}，请根据玩家最近的行动记录和当前场景信息，从npcList：${JSON.stringify(
         npclist
-      )}中选择出所有所有在场角色，以##["角色1","角色2",...]##的格式返回。`;
+      )}中选择出所有所有在场角色，角色名称只能从npcList中选取，以##["角色1","角色2",...]##的格式返回。`;
       const rawNpc = await this.storyInfoProcessor.query(npcSelectPrompt);
       const npcNameMatch = rawNpc.match(/##\["([^"]+)"\]##/);
       const npcNames = npcNameMatch ? npcNameMatch[1].trim().split(",") : [];

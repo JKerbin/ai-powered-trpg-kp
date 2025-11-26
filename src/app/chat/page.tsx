@@ -9,6 +9,20 @@ interface Message {
   isStreaming?: boolean;
 }
 
+// 定义历史记录条目接口，匹配history.json的结构
+interface HistoryEntry {
+  timestamp: number;
+  role: "Game Keeper" | "Player";
+  content: string;
+}
+
+// 将HistoryEntry转换为Message的工具函数
+const historyToMessage = (entry: HistoryEntry): Message => ({
+  id: entry.timestamp.toString(),
+  content: entry.content,
+  sender: entry.role === "Player" ? "user" : "bot"
+})
+
 // 定义流式响应数据类型
 interface StreamData {
   success: boolean;
@@ -22,13 +36,83 @@ export default function Chatbot() {
     {
       id: "1",
       content:
-        "你好！我是一个简单的聊天机器人。无论你说什么，我都会回复乱数假文。",
+        "正在加载历史数据...",
       sender: "bot",
     },
   ]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
+  const [saveId, setSaveId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // 从URL中提取userId和saveId
+  useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const extractedUserId = searchParams.get('userId');
+    const extractedSaveId = searchParams.get('saveId');
+    
+    if (extractedUserId) {
+      setUserId(extractedUserId);
+    }
+    
+    if (extractedSaveId) {
+      setSaveId(extractedSaveId);
+    }
+  }, []);
+
+  // 加载历史记录文件 - 现在使用真实的API端点
+  const loadHistory = async (userId: string, saveId: string) => {
+    try {
+      console.log(`Loading history for userId: ${userId}, saveId: ${saveId}`);
+      // 调用新创建的API端点获取历史记录
+      const response = await fetch(`/api/history?userId=${userId}&saveId=${saveId}`);
+      
+      if (!response.ok) {
+        throw new Error(`Failed to load history: ${response.status}`);
+      }
+      
+      // 解析API响应，注意现在API返回的格式包含success和data字段
+      const apiResponse = await response.json();
+      
+      if (apiResponse.success && apiResponse.data) {
+        return apiResponse.data as HistoryEntry[];
+      } else {
+        throw new Error(apiResponse.error || 'Failed to load history data');
+      }
+    } catch (error) {
+      console.error('Error loading history:', error);
+      // 如果加载失败，返回空数组，保持页面可用性
+      return [];
+    }
+  };
+
+  // 当userId和saveId都存在时，加载历史记录并转换为Message格式
+  useEffect(() => {
+    if (userId && saveId) {
+      const fetchAndSetHistory = async () => {
+        try {
+          const historyData = await loadHistory(userId, saveId);
+          
+          console.log('History data loaded:', historyData);
+          
+          if (historyData && historyData.length > 0) {
+            // 将历史记录转换为Message格式
+            const messageData = historyData.map(historyToMessage);
+            console.log('Converted to messages:', messageData);
+            // 更新messages状态
+            setMessages(messageData);
+          } else {
+            console.log('No history data found or empty');
+          }
+        } catch (error) {
+          console.error('Error fetching and setting history:', error);
+        }
+      };
+      
+      fetchAndSetHistory();
+    }
+  }, [userId, saveId]);
 
   // 自动滚动到最新消息
   const scrollToBottom = () => {
