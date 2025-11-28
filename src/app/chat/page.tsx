@@ -153,7 +153,7 @@ export default function Chatbot() {
 
     try {
       // 调用流式API获取回答
-      const response = await fetch("/api/chat", {
+      const response = await fetch(`/api/chat?userId=${userId}&saveId=${saveId}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

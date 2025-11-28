@@ -72,6 +72,7 @@ export async function POST(request: Request) {
     const moduleTasks = await ModuleTasks.create(saveDir);
     // 使用从前端接收的角色信息
     await moduleTasks.initializeGame(characterInfo);
+    await moduleTasks.introduceGame();
 
     // 创建存档元数据
     const metaData = {

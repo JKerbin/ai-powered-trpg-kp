@@ -159,8 +159,16 @@ export default function ClientSaveList() {
           {!loading && !error && saves.length > 0 && (
             <div className="save-items">
               {saves.map((save) => (
-                <div key={save.saveId} className="save-item"
-                onClick={() => router.push(`/chat?userId=${userId}&saveId=${save.saveId}`)}>
+                <div
+                  key={save.saveId}
+                  className="save-item"
+                  onClick={(e) => {
+                    // 防止事件穿透，避免点击删除按钮时触发跳转
+                    if ((e.target as HTMLElement).closest(".delete-save-btn"))
+                      return;
+                    router.push(`/chat?userId=${userId}&saveId=${save.saveId}`);
+                  }}
+                >
                   <div className="save-item-content">
                     <div className="save-item-info">
                       <div className="save-name">{save.meta.name}</div>
