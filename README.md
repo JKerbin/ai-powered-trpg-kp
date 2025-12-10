@@ -12,7 +12,7 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app), designed to enhance Tabletop Role-Playing Game (TRPG) experiences through an AI Game Keeper framework.
 
 ## Project Overview
-AIKP integrates Context Engineering principles, MIRIX-style multi-type memory architecture, and multi-agent collaboration to address key limitations of traditional LLM-based TRPG Game Keepers. The framework transforms flat vector databases into a structured memory system, enabling active retrieval, dynamic context assembly, and improved adherence to TRPG rules and narrative consistency. It supports scenario management, character creation, real-time narrative interaction, and persistent session storage—ideal for TRPGs like *Call of Cthulhu: Black Water*.
+AIKP integrates Context Engineering principles, multi-type memory architecture, and multi-agent collaboration to address key limitations of traditional LLM-based TRPG Game Keepers. The framework transforms flat vector databases into a structured memory system, enabling active retrieval, dynamic context assembly, and improved adherence to TRPG rules and narrative consistency. It supports scenario management, character creation, real-time narrative interaction, and persistent session storage—ideal for TRPGs like *Call of Cthulhu: Black Water*.
 
 ## Environmental Installation
 
@@ -58,4 +58,4 @@ pnpm dev
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result. You can upload TRPG scenario PDFs, create player characters, and engage in immersive role-play with the AI Game Keeper—no skilled human Game Keeper required!
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result. You can upload TRPG scenario PDFs, create player characters, and engage in immersive role-play with the AI Game Keeper—no skilled human Game Keeper required.
