@@ -1,4 +1,14 @@
-# AI-Powered TRPG Game Keeper (AIKP)
+![title](https://github.com/user-attachments/assets/0c5df183-6436-465b-8afe-2a83732d5be9)
+
+<p align="center">
+  <img src="https://img.shields.io/github/package-json/dependency-version/JKerbin/ai-powered-trpg-kp/next" alt="next-version">
+  <img src="https://img.shields.io/github/package-json/dependency-version/JKerbin/ai-powered-trpg-kp/react" alt="react-version">
+  <img src="https://img.shields.io/github/package-json/dependency-version/JKerbin/ai-powered-trpg-kp/@llm-tools/embedjs" alt="embedjs-version">
+  <img src="https://img.shields.io/github/package-json/dependency-version/JKerbin/ai-powered-trpg-kp/sass" alt="sass-version">
+  <img src="https://img.shields.io/github/package-json/dependency-version/JKerbin/ai-powered-trpg-kp/zod" alt="zod-version">
+  <img src="https://img.shields.io/github/package-json/dependency-version/JKerbin/ai-powered-trpg-kp/gsap" alt="gsap-version">
+</p>
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app), designed to enhance Tabletop Role-Playing Game (TRPG) experiences through an AI Game Keeper framework.
 
 ## Project Overview
