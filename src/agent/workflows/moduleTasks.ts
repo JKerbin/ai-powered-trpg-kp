@@ -249,7 +249,7 @@ class ModuleTasks {
         sceneInfo
       )}，与当前剧情相关的角色信息为${JSON.stringify(
         npcInfo
-      )}。玩家下一步的行动为${playerAction}。请根据玩家信息和游戏模组设定，以及之间发生的剧情总结：${plotSummary}，继续游戏，注意不需要给玩家太具体的行动选项，只需要引导玩家需要采取行动即可。`;
+      )}。玩家下一步的行动为${playerAction}。请根据玩家信息和游戏模组设定，以及之间发生的剧情总结：${plotSummary}，继续游戏，请尽量快地推进剧情发展。`;
       history.push({
         timestamp: Date.now(),
         role: "Player",
